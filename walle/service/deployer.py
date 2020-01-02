@@ -57,13 +57,14 @@ class Deployer:
     release_version_tar, previous_release_version, release_version = None, None, None
     local = None
 
-    def __init__(self, task_id=None, project_id=None, console=False):
+    def __init__(self, task_id=None, project_id=None, console=False,api_trigger=False):
         self.local_codebase = current_app.config.get('CODE_BASE').rstrip('/') + '/'
         self.localhost = Waller(host='127.0.0.1')
         self.TaskRecord = RecordModel()
-
+        
         if task_id:
             self.task_id = task_id
+            self.api_trigger = api_trigger
             # task start
             current_app.logger.info(self.task_id)
             self.taskMdl = TaskModel().item(self.task_id)
@@ -473,9 +474,11 @@ class Deployer:
         # 清理本地
         self.cleanup_local()
         if success:
-            emit('success', {'event': 'finish', 'data': {'message': '部署完成，辛苦了，为你的努力喝彩！'}}, room=self.task_id)
+            if not self.api_trigger:
+                emit('success', {'event': 'finish', 'data': {'message': '部署完成，辛苦了，为你的努力喝彩！'}}, room=self.task_id)
         else:
-            emit('fail', {'event': 'finish', 'data': {'message': Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
+            if not self.api_trigger:
+                emit('fail', {'event': 'finish', 'data': {'message': Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
 
     def walle_deploy(self):
         self.start()
@@ -499,7 +502,8 @@ class Deployer:
                     RecordModel().save_record(stage=RecordModel.stage_end, sequence=0, user_id=current_user.id,
                                               task_id=self.task_id, status=RecordModel.status_success, host=host,
                                               user=server_info['user'], command='')
-                    emit('success', {'event': 'finish', 'data': {'host': host, 'message': host + ' 部署完成！'}}, room=self.task_id)
+                    if not self.api_trigger:
+                        emit('success', {'event': 'finish', 'data': {'host': host, 'message': host + ' 部署完成！'}}, room=self.task_id)
                 except Exception as e:
                     is_all_servers_success = False
                     current_app.logger.exception(e)
@@ -507,13 +511,14 @@ class Deployer:
                     RecordModel().save_record(stage=RecordModel.stage_end, sequence=0, user_id=current_user.id,
                                               task_id=self.task_id, status=RecordModel.status_fail, host=host,
                                               user=server_info['user'], command='')
-                    emit('fail', {'event': 'finish', 'data': {'host': host, 'message': host + Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
+                    if not self.api_trigger:
+                        emit('fail', {'event': 'finish', 'data': {'host': host, 'message': host + Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
             self.end(is_all_servers_success)
 
         except Exception as e:
+            current_app.logger.exception(e)
             self.end(False)
-
-        return {'success': self.success, 'errors': self.errors}
+        return {'success': is_all_servers_success,'errors': self.errors }
 
     def walle_rollback(self):
         self.start()
@@ -533,7 +538,8 @@ class Deployer:
                     RecordModel().save_record(stage=RecordModel.stage_end, sequence=0, user_id=current_user.id,
                                               task_id=self.task_id, status=RecordModel.status_success, host=host,
                                               user=server_info['user'], command='')
-                    emit('success', {'event': 'finish', 'data': {'host': host, 'message': host + ' 部署完成！'}}, room=self.task_id)
+                    if not self.api_trigger:
+                        emit('success', {'event': 'finish', 'data': {'host': host, 'message': host + ' 部署完成！'}}, room=self.task_id)
                 except Exception as e:
                     is_all_servers_success = False
                     current_app.logger.exception(e)
@@ -541,10 +547,11 @@ class Deployer:
                     RecordModel().save_record(stage=RecordModel.stage_end, sequence=0, user_id=current_user.id,
                                               task_id=self.task_id, status=RecordModel.status_fail, host=host,
                                               user=server_info['user'], command='')
-                    emit('fail', {'event': 'finish', 'data': {'host': host, 'message': host + Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
+                    if not self.api_trigger:
+                        emit('fail', {'event': 'finish', 'data': {'host': host, 'message': host + Code.code_msg[Code.deploy_fail]}}, room=self.task_id)
             self.end(is_all_servers_success)
 
         except Exception as e:
             self.end(False)
-
-        return {'success': self.success, 'errors': self.errors}
+            current_app.logger.exception(e)
+        return {'success': is_all_servers_success, 'errors': self.errors}

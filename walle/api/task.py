@@ -65,6 +65,8 @@ class TaskAPI(SecurityResource):
         :return:
         """
         super(TaskAPI, self).post()
+        current_app.logger.info('----------------task------------------')
+        current_app.logger.info(request.form)
 
         form = TaskForm(request.form, csrf=False)
         if form.validate_on_submit():

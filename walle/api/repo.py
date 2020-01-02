@@ -7,7 +7,7 @@
     :created time: 2017-03-25 11:15:01
     :author: wushuiyong@walle-web.io
 """
-from flask import request, abort
+from flask import request, abort ,current_app
 from walle.api.api import SecurityResource
 from walle.service.deployer import Deployer
 from walle.service.extensions import permission
@@ -68,10 +68,13 @@ class RepoAPI(SecurityResource):
 
         :return:
         """
+        current_app.logger.info('args----------------')
+        current_app.logger.info(project_id)
+        current_app.logger.info(request.args)
         branch = request.args.get('branch', '')
         wi = Deployer(project_id=project_id)
         commits = wi.list_commit(branch)
 
         return self.render_json(data={
-            'branches': commits,
+            'commits': commits,
         })

@@ -25,7 +25,7 @@ SETTINGS = {
 class ProdConfig(Config):
     """Production configuration."""
     ENV = 'prod'
-    DEBUG = False
+    DEBUG = True
     SQLALCHEMY_ECHO = False
 
     # 服务启动 @TODO

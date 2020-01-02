@@ -81,7 +81,8 @@ function start() {
     echo "----------------"
     source ./venv/bin/activate
     mkdir -p logs
-    nohup python ${APP} >> logs/runtime.log 2>&1 &
+    python ${APP}  
+    # nohup python ${APP} >> logs/runtime.log 2>&1 &
     echo -e "Start walle:                 [\033[32m ok \033[0m]"
     echo -e "runtime: \033[32m logs/runtime.log \033[0m"
     echo -e "error: \033[32m logs/error.log \033[0m"

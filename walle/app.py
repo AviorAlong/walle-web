@@ -110,7 +110,7 @@ def register_blueprints(app):
     api.add_resource(BaseAPI.Base, '/', endpoint='root')
     api.add_resource(GeneralAPI.GeneralAPI, '/api/general/<string:action>', endpoint='general')
     api.add_resource(SpaceAPI.SpaceAPI, '/api/space/', '/api/space/<int:space_id>', '/api/space/<int:space_id>/<string:action>', endpoint='space')
-    api.add_resource(DeployAPI.DeployAPI, '/api/deploy/', '/api/deploy/<int:task_id>', endpoint='deploy')
+    api.add_resource(DeployAPI.DeployAPI, '/api/deploy/', '/api/deploy/<int:task_id>', '/api/deploy/<string:action>',endpoint='deploy')
     api.add_resource(AccessAPI.AccessAPI, '/api/access/', '/api/access/<int:access_id>', endpoint='access')
     api.add_resource(RoleAPI.RoleAPI, '/api/role/', endpoint='role')
     api.add_resource(GroupAPI.GroupAPI, '/api/group/', '/api/group/<int:group_id>', endpoint='group')
@@ -118,8 +118,8 @@ def register_blueprints(app):
     api.add_resource(UserAPI.UserAPI, '/api/user/', '/api/user/<int:user_id>/<string:action>', '/api/user/<string:action>', '/api/user/<int:user_id>', endpoint='user')
     api.add_resource(ServerAPI.ServerAPI, '/api/server/', '/api/server/<int:id>', endpoint='server')
     api.add_resource(ProjectAPI.ProjectAPI, '/api/project/', '/api/project/<int:project_id>', '/api/project/<int:project_id>/<string:action>', endpoint='project')
-    api.add_resource(RepoApi.RepoAPI, '/api/repo/<string:action>/', endpoint='repo')
-    api.add_resource(TaskAPI.TaskAPI, '/api/task/', '/api/task/<int:task_id>', '/api/task/<int:task_id>/<string:action>', endpoint='task')
+    api.add_resource(RepoApi.RepoAPI, '/api/repo/<string:action>', endpoint='repo')
+    api.add_resource(TaskAPI.TaskAPI, '/api/task/','/api/task/<int:task_id>', '/api/task/<int:task_id>/<string:action>', endpoint='task')
     api.add_resource(EnvironmentAPI.EnvironmentAPI, '/api/environment/', '/api/environment/<int:env_id>', endpoint='environment')
 
     return None
