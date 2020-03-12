@@ -431,7 +431,8 @@ class Deployer:
             result = self.localhost.local(command, wenv=self.config())
 
     def cleanup_remote(self, waller):
-        command = 'rm -rf {project_id}_{task_id}_*.tgz'.format(project_id=self.project_info['id'], task_id=self.task_id)
+        command = 'ls -t ./ | grep "^{project_id}_" | tail -n +{keep_version_num} | xargs rm -rf'.format(project_id=self.project_info['id'], keep_version_num=int(self.project_info['keep_version_num']) + 1)
+        # command = 'rm -rf {project_id}_{task_id}_*.tgz'.format(project_id=self.project_info['id'], task_id=self.task_id)
         with waller.cd(self.project_info['target_releases']):
             result = waller.run(command, wenv=self.config())
         
@@ -470,7 +471,7 @@ class Deployer:
             else:
                 notice_info['title'] = '上线部署失败'
                 notice.deploy_task(project_info=self.project_info, notice_info=notice_info)
-
+            
         # 清理本地
         self.cleanup_local()
         if success:
